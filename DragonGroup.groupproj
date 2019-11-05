@@ -1,0 +1,36 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{D9176DEF-F910-4408-9A57-C60F65470002}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="dragonfly.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="dragonfly">
+        <MSBuild Projects="dragonfly.dproj"/>
+    </Target>
+    <Target Name="dragonfly:Clean">
+        <MSBuild Projects="dragonfly.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="dragonfly:Make">
+        <MSBuild Projects="dragonfly.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="dragonfly"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="dragonfly:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="dragonfly:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>
