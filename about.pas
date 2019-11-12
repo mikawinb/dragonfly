@@ -14,6 +14,7 @@ type
     Copyright: TLabel;
     Comments: TLabel;
     OKButton: TButton;
+    procedure FormCreate(Sender: TObject);
   private
     { Private declarations }
   public
@@ -25,7 +26,24 @@ var
 
 implementation
 
+uses
+  VersionRoutine;
+
 {$R *.DFM}
+
+procedure TAboutForm.FormCreate(Sender: TObject);
+var
+  strFileName: string;
+  strVersion: string;
+
+begin
+  strFileName := 'dragonfly.exe';
+
+  strVersion := FileVersion(strFileName);
+
+  Version.Caption := strVersion;
+
+end;
 
 end.
  

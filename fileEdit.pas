@@ -1,4 +1,4 @@
-unit spellingCorrector;
+unit fileEdit;
 
 interface
 
@@ -7,7 +7,7 @@ uses
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls;
 
 type
-  TForm2 = class(TForm)
+  TFormFileEdit = class(TForm)
     MemoBox: TMemo;
     Label1: TLabel;
     Label2: TLabel;
@@ -18,6 +18,8 @@ type
     CorrectButton: TButton;
     procedure FormCreate(Sender: TObject);
     procedure LoadButtonClick(Sender: TObject);
+    procedure CorrectButtonClick(Sender: TObject);
+    procedure SaveButtonClick(Sender: TObject);
   private
     { Private declarations }
   public
@@ -25,7 +27,7 @@ type
   end;
 
 var
-  Form2: TForm2;
+  FormFileEdit: TFormFileEdit;
   fileName : String;
   fileData : TStringList;
   openDialog : TOpenDialog;
@@ -34,14 +36,22 @@ implementation
 
 {$R *.dfm}
 
-procedure TForm2.FormCreate(Sender: TObject);
+procedure TFormFileEdit.CorrectButtonClick(Sender: TObject);
+begin
+  // Clear the file display box and the label
+  MemoBox.Clear;
+  Label4.Caption := '';
+  close;
+end;
+
+procedure TFormFileEdit.FormCreate(Sender: TObject);
 begin
   // Set the title of the form - our application title
-  Form2.Caption := 'Enkel stavningskorrigering';
+  FormFileEdit.Caption := 'Enkel fileditering';
 
   // Disable all except the load file button
   SaveButton.Enabled := false;
-  CorrectButton.Enabled := false;
+  // CorrectButton.Enabled := false;
 
   // Clear the file display box
   MemoBox.Clear;
@@ -51,7 +61,7 @@ begin
   MemoBox.ScrollBars := ssBoth;
 
   // do not allow the user to directly type into the displayed file text
-  MemoBox.ReadOnly := true;
+  // MemoBox.ReadOnly := true;
 
   // Set the font of the memo box to a mono-spaced one to ease reading
    MemoBox.Font.Name := 'Courier New';
@@ -69,14 +79,14 @@ begin
    openDialog.Options := [OfFileMustExist];
 
    // Ask only for text files
-   openDialog.Filter := 'Text files|*.txt';
+   openDialog.Filter := 'Text files (*.txt)|*.txt|Any file (*.*)|*.*';
 
    // Create the string list object that holds the file contents
    fileData := TStringList.Create;
 
 end;
 
-procedure TForm2.LoadButtonClick(Sender: TObject);
+procedure TFormFileEdit.LoadButtonClick(Sender: TObject);
 begin
   // Display the file selection dialog
   if openDialog.Execute then
@@ -100,8 +110,17 @@ begin
 
     // Display the number of lines in the file
     Label4.Caption := fileName+' har ' +IntToStr(fileData.Count)+ ' rader med text';
+
+    SaveButton.Enabled := true;
   end;
 
+end;
+
+procedure TFormFileEdit.SaveButtonClick(Sender: TObject);
+begin
+  // Simply save the contents of the edited memobox
+  if fileName <> '' then
+  MemoBox.Lines.SaveToFile(fileName);
 end;
 
 end.

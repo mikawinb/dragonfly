@@ -4,18 +4,18 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, Buttons, Menus, ActnList, System.Actions;
+  StdCtrls, Buttons, Menus, ActnList, System.Actions, Vcl.ExtDlgs;
 
 type
   TForm1 = class(TForm)
     Edit1: TEdit;
-    BitBtn1: TBitBtn;
+    BitBtnVand: TBitBtn;
     BitBtn2: TBitBtn;
-    BitBtn3: TBitBtn;
+    BitBtnPermut: TBitBtn;
     Memo1: TMemo;
     Label1: TLabel;
     Label2: TLabel;
-    BitBtn4: TBitBtn;
+    BitBtnRensa: TBitBtn;
     BitBtn5: TBitBtn;
     MainMenu1: TMainMenu;
     Arkiv1: TMenuItem;
@@ -23,28 +23,38 @@ type
     N2: TMenuItem;
     ActionList1: TActionList;
     Action1: TAction;
-    BitBtn6: TBitBtn;
+    BitBtnFlytta: TBitBtn;
     Kommandon1: TMenuItem;
-    Hjlp1: TMenuItem;
-    Hjlp2: TMenuItem;
+    Hjalp1: TMenuItem;
+    HjalpHjalp2: TMenuItem;
     N3: TMenuItem;
     Om1: TMenuItem;
     Spara1: TMenuItem;
-    Rensa1: TMenuItem;
     BitBtn7: TBitBtn;
     Label3: TLabel;
+    SaveTextFileDialog: TSaveTextFileDialog;
+    Oppna1: TMenuItem;
+    Vnd1: TMenuItem;
+    Permut1: TMenuItem;
+    FlyttaX1: TMenuItem;
+    Rensa1: TMenuItem;
     procedure Permute(x, y: string);
-    procedure BitBtn1Click(Sender: TObject);
-    procedure BitBtn3Click(Sender: TObject);
-    procedure BitBtn4Click(Sender: TObject);
+    procedure BitBtnVandClick(Sender: TObject);
+    procedure BitBtnPermutClick(Sender: TObject);
+    procedure BitBtnRensaClick(Sender: TObject);
     procedure BitBtn5Click(Sender: TObject);
-    // procedure Edit1Exit(Sender: TObject);
     procedure Action1Execute(Sender: TObject);
-    procedure BitBtn6Click(Sender: TObject);
+    procedure BitBtnFlyttaClick(Sender: TObject);
     procedure Om1Click(Sender: TObject);
     procedure BitBtn7Click(Sender: TObject);
     procedure Edit1Change(Sender: TObject);
     procedure FormCreate(Sender: TObject);
+    procedure Oppna1Click(Sender: TObject);
+    procedure Permut1Click(Sender: TObject);
+    procedure Spara1Click(Sender: TObject);
+    procedure Vnd1Click(Sender: TObject);
+    procedure FlyttaX1Click(Sender: TObject);
+    procedure Rensa1Click(Sender: TObject);
   private
     { Private declarations }
   public
@@ -56,9 +66,14 @@ var
 
 implementation
 
-uses about, spellingCorrector;
+uses about, fileEdit;
 
 {$R *.DFM}
+
+procedure TForm1.Permut1Click(Sender: TObject);
+begin
+  BitBtnPermutClick(Permut1);
+end;
 
 procedure TForm1.Permute(x, y: string);
 var
@@ -85,7 +100,22 @@ begin
     end;
 end;
 
-procedure TForm1.BitBtn1Click(Sender: TObject);
+procedure TForm1.Rensa1Click(Sender: TObject);
+begin
+  BitBtnRensaClick(Rensa1);
+end;
+
+procedure TForm1.Spara1Click(Sender: TObject);
+begin
+  BitBtn5Click(Spara1);
+end;
+
+procedure TForm1.Vnd1Click(Sender: TObject);
+begin
+  BitBtnVandClick(Vnd1);
+end;
+
+procedure TForm1.BitBtnVandClick(Sender: TObject);
 var
   instring, res: string;
   i: integer;
@@ -103,7 +133,7 @@ begin
   Memo1.Lines.Add(res);
 end;
 
-procedure TForm1.BitBtn3Click(Sender: TObject);
+procedure TForm1.BitBtnPermutClick(Sender: TObject);
 var
   instring: string;
 
@@ -125,7 +155,7 @@ begin
   end;
 end;
 
-procedure TForm1.BitBtn4Click(Sender: TObject);
+procedure TForm1.BitBtnRensaClick(Sender: TObject);
 begin
   { Tömmer Edit rutan, MemoPaden och sätter focus till Edit rutan. }
   Edit1.Text := '';
@@ -137,17 +167,52 @@ end;
 procedure TForm1.BitBtn5Click(Sender: TObject);
 var
   word: string;
-  mapp: string;
+  // mapp: string;
 
 begin
   { Hämtar ordet. }
   word := Edit1.Text;
-  { Skriver till fil. }
-  Memo1.Lines.SaveToFile('Permutation of ' + word + ' .txt');
-  GetDir(0, mapp); { 0 = Current drive }
-  MessageDlg('Fil är skapad, med sökväg och namn: ' + mapp + '\Permutation of '
-    + word + ' .txt', mtInformation, [mbOk], 0);
-  { ShowMessage('Fil är skapad, med sökväg och namn: ' + mapp +'\Permutation of ' + word + ' .txt'); }
+  // Create the save dialog object - assign to our save dialog variable
+  SaveTextFileDialog := TSaveTextFileDialog.Create(self);
+
+  // Set up the starting directory to be the current one
+  // SaveTextFileDialog.InitialDir := GetCurrentDir;
+  // SaveTextFileDialog.InitialDir := '.';
+
+  ForceCurrentDirectory := False;
+
+  // Filter
+  SaveTextFileDialog.Filter := 'Text files (*.txt)|*.txt|Any file (*.*)|*.*';
+
+  // Default extension
+  SaveTextFileDialog.DefaultExt := 'txt';
+
+  // Select text files as the starting filter type
+  saveTextFileDialog.FilterIndex := 1;
+
+  // Förslag på filnamn
+  SaveTextFileDialog.FileName := word;
+
+  // Display the open text file dialog.
+  if SaveTextFileDialog.Execute then
+  // First check if the file exists.
+    if FileExists(SaveTextFileDialog.FileName) then
+      // If it exists, raise an exception.
+      raise Exception.Create('Fil finns redan. Går inte att skriva över.')
+    else
+    begin
+      { Otherwise, save the memo box lines into the file. }
+      Memo1.Lines.SaveToFile(SaveTextFileDialog.FileName);
+      // Free up the dialog
+      SaveTextFileDialog.Free;
+    end;
+
+  //  { Skriver till fil. }
+  //  Memo1.Lines.SaveToFile('Permutation of ' + word + ' .txt');
+  //  GetDir(0, mapp); { 0 = Current drive }
+  //  MessageDlg('Fil är skapad, med sökväg och namn: ' + mapp + '\Permutation of '
+  //    + word + ' .txt', mtInformation, [mbOk], 0);
+    { ShowMessage('Fil är skapad, med sökväg och namn: ' + mapp +'\Permutation of ' + word + ' .txt'); }
 end;
 
 procedure TForm1.Edit1Change(Sender: TObject);
@@ -162,12 +227,11 @@ begin
 
 end;
 
-// procedure TForm1.Edit1Exit(Sender: TObject);
-// begin
-// if Length(Edit1.Text) > 7 then
-// BitBtn3.Enabled := False;
-// ShowMessage('Går inte med fler än 7 tecken!');
-// end;
+
+procedure TForm1.FlyttaX1Click(Sender: TObject);
+begin
+  BitBtnFlyttaClick(FlyttaX1);
+end;
 
 procedure TForm1.FormCreate(Sender: TObject);
 begin
@@ -179,7 +243,7 @@ begin
   Close;
 end;
 
-procedure TForm1.BitBtn6Click(Sender: TObject);
+procedure TForm1.BitBtnFlyttaClick(Sender: TObject);
 var
   SAntalTecken: string;
   ClickedOK: Boolean;
@@ -211,13 +275,18 @@ end;
 
 procedure TForm1.BitBtn7Click(Sender: TObject);
 begin
-  Form2.Show;
+  FormFileEdit.Show;
 end;
 
 procedure TForm1.Om1Click(Sender: TObject);
 begin
   { Visa Om rutan }
   AboutForm.ShowModal;
+end;
+
+procedure TForm1.Oppna1Click(Sender: TObject);
+begin
+  FormFileEdit.Show;
 end;
 
 end.
